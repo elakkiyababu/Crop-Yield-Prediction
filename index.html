@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Yield Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://img.freepik.com/free-photo/futuristic-technology-concept_23-2151908084.jpg?semt=ais_hybrid&w=740'); /* Set your image here */
+            background-size: cover; /* Cover the entire page */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-attachment: fixed; /* Keep image fixed when scrolling */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px; /* Add some padding to prevent content touching edges */
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.7); /* Adjusted transparency to 0.7 */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+            width: 100%;
+            max-width: 700px; /* Increased max-width for better layout with two columns */
+            box-sizing: border-box;
+            display: flex; /* Use flexbox for two columns */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: space-between; /* Space out items */
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: bold; /* Make the title bold */
+            width: 100%; /* Make title span full width */
+        }
+        .form-column {
+            flex: 1; /* Allow columns to grow */
+            min-width: 280px; /* Minimum width for each column */
+            padding: 0 15px; /* Padding between columns */
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 18px; /* Increased margin for better spacing */
+        }
+        label {
+            display: block;
+            margin-bottom: 6px; /* Increased margin */
+            color: #444; /* Slightly darker label color */
+            font-weight: bold; /* Make labels bold */
+            font-size: 1.05em; /* Slightly larger font size for labels */
+        }
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px; /* Increased padding for inputs */
+            border: 1px solid #ccc; /* Lighter border */
+            border-radius: 5px; /* Slightly more rounded corners */
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease; /* Smooth transition for focus */
+        }
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            border-color: #007bff; /* Highlight on focus */
+            outline: none; /* Remove default outline */
+        }
+        button {
+            width: 100%;
+            padding: 14px; /* Increased padding for button */
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px; /* Slightly more rounded corners */
+            font-size: 19px; /* Larger font size for button */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Add transform for slight pop */
+            margin-top: 20px; /* Space above button */
+        }
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+        .prediction-result {
+            margin-top: 25px; /* Increased margin */
+            padding: 25px; /* Increased padding for more visibility */
+            background-color: #d4edda; /* Solid light green for success/info (fully opaque) */
+            border: 1px solid #c3e6cb; /* Matching border */
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.4em; /* Significantly larger font size for output */
+            color: #155724; /* Darker green text */
+            display: none;
+            width: 100%; /* Make result span full width */
+            box-sizing: border-box;
+            font-weight: bold; /* Make the entire result text bold */
+        }
+        .prediction-result strong {
+            font-size: 1.6em; /* Even larger font size for the predicted value itself */
+            color: #0d6e2e; /* Even darker green for emphasis */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Crop Yield Prediction</h1>
+
+        <form id="predictionForm" action="/predict" method="post" style="width: 100%; display: flex; flex-wrap: wrap; justify-content: space-between;">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="year">Year:</label>
+                    <input type="number" id="year" name="year" min="1900" max="2100" placeholder="e.g., 2023" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <input type="text" id="country" name="country" placeholder="e.g., India" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="item">Crop Item:</label>
+                    <input type="text" id="item" name="item" placeholder="e.g., Wheat, Rice, Maize" required>
+                </div>
+            </div>
+
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="area">Area (Hectares or equivalent unit):</label>
+                    <input type="number" id="area" name="area" step="any" min="0" placeholder="e.g., 100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pesticides">Pesticides (Tons or equivalent unit):</label>
+                    <input type="number" id="pesticides" name="pesticides" step="any" min="0" placeholder="e.g., 500" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="avg_temp">Average Temperature ($^\circ C$):</label>
+                    <input type="number" id="avg_temp" name="avg_temp" step="any" placeholder="e.g., 25.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="avg_rainfall">Average Rainfall (mm/year):</label>
+                    <input type="number" id="avg_rainfall" name="avg_rainfall" step="any" min="0" placeholder="e.g., 1200" required>
+                </div>
+            </div>
+
+            <button type="submit">Predict Yield</button>
+        </form>
+
+        <div id="predictionResult" class="prediction-result">
+            </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const resultDiv = document.getElementById('predictionResult');
+            resultDiv.style.display = 'block'; // Show the result div
+
+            resultDiv.innerHTML = 'Predicting...';
+
+            setTimeout(() => {
+                // Replace this with actual prediction from your backend
+                const simulatedYield = (Math.random() * 1000 + 500).toFixed(2); // Example random yield
+                resultDiv.innerHTML = `Predicted Crop Yield for ${data.item} in ${data.country}: <strong>${simulatedYield} units</strong>`;
+            }, 2000); // Simulate 2-second delay
+        });
+    </script>
+</body>
+</html>
